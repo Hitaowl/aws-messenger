@@ -9,7 +9,7 @@ import java.net.Socket;
     simpler Client, verbindet sich zum angegeben Server auf dem spezifischen Port,
     macht ein- und ausgehende Streams auf und wartet auf UserInput und Antworten vom Server
  */
-public class Client {
+public class ClientChatroom {
 
     public static void main(String args[]){
 
