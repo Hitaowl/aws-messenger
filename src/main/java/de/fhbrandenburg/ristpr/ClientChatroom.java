@@ -35,13 +35,17 @@ public class ClientChatroom {
             String toServerMessage;
 
             // solange man keine Escape Sequenz benutzt läuft die Schleife
-            while((fromServerMessage = reader.readLine()) != null) {
-                System.out.println("Server: " + fromServerMessage);
+            while(true) {
 
                 toServerMessage = stdIn.readLine();
                 if (toServerMessage != null){
                     System.out.println(username + ": " + toServerMessage);
                     writer.println(toServerMessage);
+                    writer.flush();
+                }
+
+                if ((fromServerMessage = reader.readLine()) != null){
+                    System.out.println(fromServerMessage);
                 }
             }
         }
