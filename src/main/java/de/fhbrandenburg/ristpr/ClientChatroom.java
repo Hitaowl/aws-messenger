@@ -11,6 +11,8 @@ import java.net.Socket;
  */
 public class ClientChatroom {
 
+    BufferedReader reader;
+
     public static void main(String args[]){
 
         int serverPort = 4444;
@@ -21,26 +23,25 @@ public class ClientChatroom {
             // Verbindung zum Server
             InetAddress serverHost = InetAddress.getByName(hostName);
             System.out.println("Verbinden zum Server auf Port: " + serverPort);
-            Socket socket = new Socket(serverHost, serverPort);
-            System.out.println("Verbunden mit dem Server " + socket.getRemoteSocketAddress());
+            Socket client = new Socket(serverHost, serverPort);
+            System.out.println("Verbunden mit dem Server " + client.getRemoteSocketAddress());
 
-            // Reader und Writer aufbauen
-            PrintWriter toServer = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader fromServer = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+            // Reader und Writer aufbauen       //
+            PrintWriter writer = new PrintWriter(client.getOutputStream());
+            BufferedReader reader = new BufferedReader( new InputStreamReader(client.getInputStream()));
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-            String fromServerString;
-            String toServerString;
+            String fromServerMessage;
+            String toServerMessage;
 
             // solange man keine Escape Sequenz benutzt läuft die Schleife
-            while((fromServerString = fromServer.readLine()) != null) {
-                System.out.println("Server: " + fromServerString);
+            while((fromServerMessage = reader.readLine()) != null) {
+                System.out.println("Server: " + fromServerMessage);
 
-                toServerString = stdIn.readLine();
-                if (toServerString != null){
-                    System.out.println(username + ": " + toServerString);
-                    toServer.println(toServerString);
+                toServerMessage = stdIn.readLine();
+                if (toServerMessage != null){
+                    System.out.println(username + ": " + toServerMessage);
+                    writer.println(toServerMessage);
                 }
             }
         }
