@@ -48,7 +48,7 @@ public class Server {
                 PrintWriter writer = new PrintWriter(client.getOutputStream());
                 listClientWriter.add(writer);
 
-                Thread clientThread = new Thread(new ClientHandler(this, client));
+                ClientHandler clientThread = new ClientHandler(this, client);
                 clientThread.start();
 
                 Loger.LOG("neuer Client: " + clientThread.getName());

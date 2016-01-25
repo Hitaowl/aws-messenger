@@ -13,6 +13,7 @@ public class ClientHandler implements Runnable {
     Server server;
     Socket client;
     BufferedReader reader;
+    Thread thread = null;
 
     public ClientHandler(Server server, Socket client) {
 
@@ -32,7 +33,22 @@ public class ClientHandler implements Runnable {
                 server.sendToAllClients(message);
             }
         } catch (IOException e) {
-
+            stop();
         }
+    }
+
+    public synchronized void start(){
+        if (thread == null){
+            thread = new Thread(this);
+            thread.start();
+        }
+    }
+
+    public synchronized void stop(){
+        thread.interrupt();
+    }
+
+    public synchronized String getName(){
+        return thread.getName();
     }
 }
