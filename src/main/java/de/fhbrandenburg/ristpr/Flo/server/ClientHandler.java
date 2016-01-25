@@ -1,4 +1,4 @@
-package de.fhbrandenburg.ristpr.Flo;
+package de.fhbrandenburg.ristpr.Flo.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;

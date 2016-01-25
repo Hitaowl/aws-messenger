@@ -1,6 +1,7 @@
-package de.fhbrandenburg.ristpr.Flo;
+package de.fhbrandenburg.ristpr.Flo.server;
 
 import de.fhbrandenburg.ristpr.Flo.util.Loger;
+import de.fhbrandenburg.ristpr.Flo.util.connectRDS;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,6 +21,8 @@ public class Server {
     private InetAddress IP;
     private ServerSocket serverSocket;
     private ArrayList<PrintWriter> listClientWriter;
+    private connectRDS database;
+
 
     public Server(String ipAdress, int port) {
 
@@ -28,6 +31,7 @@ public class Server {
             IP = InetAddress.getByName(ipAdress);
             serverSocket = new ServerSocket(port, 1000, IP);
             listClientWriter = new ArrayList<PrintWriter>();
+            database = new connectRDS();
             Loger.LOG("Server wurde erfolgreich gestartet");
         } catch (UnknownHostException e) {
             e.printStackTrace();
