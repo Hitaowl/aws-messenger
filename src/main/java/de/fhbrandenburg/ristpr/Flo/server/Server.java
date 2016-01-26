@@ -34,6 +34,7 @@ public class Server {
             serverSocket = new ServerSocket(port, 1000, IP);
             listClientWriter = new ArrayList<PrintWriter>();
             database = new connectRDS();
+
             Loger.LOG("Server wurde erfolgreich gestartet");
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -54,8 +55,20 @@ public class Server {
                 PrintWriter writer = new PrintWriter(client.getOutputStream());
                 listClientWriter.add(writer);
 
-                ClientHandler clientThread = new ClientHandler(this,database, client);
+                ClientHandler clientThread = new ClientHandler(this, database, client);
                 clientThread.start();
+
+                Iterator it = chatMessages.iterator();
+                int i = 0;
+
+                while (it.hasNext()) {
+
+                    writer.println(chatMessages.get(i)[1]);
+                    writer.flush();
+                    i++;
+                    it.next();
+                }
+                it.remove();
 
                 Loger.LOG("neuer Client: " + clientThread.getName());
 
@@ -66,16 +79,16 @@ public class Server {
 
     }
 
-    public void getMessagesFromServer(){
+    public void getMessagesFromServer() {
         chatMessages = database.getRecord("SELECT ID, message FROM messages LIMIT 100");
     }
 
-    public ArrayList<String[]> getMessages(){
+    public ArrayList<String[]> getMessages() {
         return chatMessages;
     }
 
-    public void startMesages(){
-        message= new MessageWriter(this);
+    public void startMesages() {
+        message = new MessageWriter(this);
         message.start();
     }
 
@@ -89,7 +102,7 @@ public class Server {
         }
     }
 
-    public void executeQuery(String sql){
+    public void executeQuery(String sql) {
         database.execute(sql);
     }
 
