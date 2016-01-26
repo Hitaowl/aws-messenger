@@ -22,6 +22,8 @@ public class Server {
     private ServerSocket serverSocket;
     private ArrayList<PrintWriter> listClientWriter;
     private connectRDS database;
+    private MessageWriter message;
+    private ArrayList<String[]> chatMessages;
 
 
     public Server(String ipAdress, int port) {
@@ -52,7 +54,7 @@ public class Server {
                 PrintWriter writer = new PrintWriter(client.getOutputStream());
                 listClientWriter.add(writer);
 
-                ClientHandler clientThread = new ClientHandler(this, client);
+                ClientHandler clientThread = new ClientHandler(this,database, client);
                 clientThread.start();
 
                 Loger.LOG("neuer Client: " + clientThread.getName());
@@ -64,6 +66,19 @@ public class Server {
 
     }
 
+    public void getMessagesFromServer(){
+        chatMessages = database.getRecord("SELECT ID, message FROM messages LIMIT 100");
+    }
+
+    public ArrayList<String[]> getMessages(){
+        return chatMessages;
+    }
+
+    public void startMesages(){
+        message= new MessageWriter(this);
+        message.start();
+    }
+
     public void sendToAllClients(String message) {
         Iterator it = listClientWriter.iterator();
 
@@ -73,4 +88,9 @@ public class Server {
             writer.flush();
         }
     }
+
+    public void executeQuery(String sql){
+        database.execute(sql);
+    }
+
 }

@@ -29,11 +29,12 @@ public class AWSMessanger {
         }
 
 
+
         // Server wird gestartet ---------------------------------------------------------
         Server chatServer = new Server("localhost", serverPort);   // getPublicDomain()
         // Server wartet auf Clienten ----------------------------------------------------
+        chatServer.startMesages();
         chatServer.listenToClients();
-
     }
 
     private static String getPublicDomain() throws IOException {
