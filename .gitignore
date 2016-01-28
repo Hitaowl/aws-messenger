@@ -1,4 +1,3 @@
-C:/Users/a/IdeaProjects/awsMmessenger/src/main/java/de/fhbrandenburg/ristpr/Flo/util/connectRDS.java
 # Created by https://www.gitignore.io/api/osx,maven,windows,intellij,java
 
 ### OSX ###
@@ -12,6 +11,8 @@ Icon
 
 # Thumbnails
 ._*
+/src/main/java/de/fhbrandenburg/ristpr/util/Constants.java
+C:/Users/a/IdeaProjects/awsMmessenger/src/main/java/de/fhbrandenburg/ristpr/util/Constants.java
 
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100

@@ -1,4 +1,4 @@
-package de.fhbrandenburg.ristpr.Flo.util;
+package de.fhbrandenburg.ristpr.util;
 
 /**
  * Created by Psycho on 25.01.2016.
