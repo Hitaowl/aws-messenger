@@ -111,7 +111,9 @@ public class Connection implements Runnable {
 
                     }
                 } catch (IOException e) {
-                    //hat die Verbindung verloren
+                    if (!this.isInterupted) {
+                        Loger.LOG(getNick() + "hat die Verbindung verloren");
+                    }
                     kill();
                 }
             }
@@ -138,9 +140,9 @@ public class Connection implements Runnable {
         connState = ConnState.DISCONNECTED;
         database.execute("DELETE FROM users WHERE userName = '" + getNick() + "' AND serverName = '" + server.getHost().getHostName() + "' AND userHost = '" + getHostName() + "'");
         try {
+            this.isInterupted = true;
             thread.interrupt();
             socket.close();
-            this.isInterupted = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
