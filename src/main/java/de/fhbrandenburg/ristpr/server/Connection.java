@@ -191,7 +191,7 @@ public class Connection implements Runnable {
                 if (id > getLinkID()) {
                     setLinkID(id);
                     if (getState() != ConnState.DISCONNECTED) {
-                        sendMsgAndFlush(":! Link :" + linkList.get(i)[1]);
+                        sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :LINK :" + linkList.get(i)[1]);
                     }
                 }
                 i++;
