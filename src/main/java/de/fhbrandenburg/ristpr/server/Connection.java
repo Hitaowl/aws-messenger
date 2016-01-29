@@ -23,7 +23,7 @@ public class Connection implements Runnable {
     private PrintWriter writer;
     private ConnState connState;
     private String nick;
-    private AbstractList<String> channel;
+    private ArrayList<String> channel;
     private InetAddress host;
     private String message;
     private ConnectToRDS database;
@@ -148,30 +148,29 @@ public class Connection implements Runnable {
 
     /**
      * schickt alle 30 sec ein Ping an den Client
-     * <p>
      * schickt alle neuen Nachrichten an den Client
      *
      * @param chatMessages Eine Liste der Messanges
      */
     public void sendMessages(ArrayList<String[]> chatMessages) {
         if (getState() == ConnState.CONNECTED_AS_CLIENT) {
+
             if ((this.time + 30000) < System.currentTimeMillis()) {
                 this.time = System.currentTimeMillis();
                 sendMsgAndFlush("PING " + getNick());
             }
+
             Iterator it = chatMessages.iterator();
             int i = 0;
             int id = 0;
 
             while (it.hasNext()) {
-                id = Integer.parseInt(chatMessages.get(i)[0]);
-                if (channel.contains(chatMessages.get(i)[3]))
+                id = Integer.parseInt(chatMessages.get(i)[0]);  // ID schon versendet?
+                if (channel.contains(chatMessages.get(i)[3]))   // ist der Client in dem entsprechendem channel?
                     if (id > getID(chatMessages.get(i)[3])) {
                         setID(chatMessages.get(i)[3], id);
                         if (getState() != ConnState.DISCONNECTED) {
-                            if (channel.contains(chatMessages.get(i)[3])) {
-                                sendMsgAndFlush(":" + chatMessages.get(i)[2] + "! PRIVMSG " + chatMessages.get(i)[3] + " :" + chatMessages.get(i)[1]);
-                            }
+                            sendMsgAndFlush(":" + chatMessages.get(i)[2] + "! PRIVMSG " + chatMessages.get(i)[3] + " :" + chatMessages.get(i)[1]);
                         }
                     }
                 i++;
@@ -181,21 +180,18 @@ public class Connection implements Runnable {
     }
 
 
-
-    public void sendLinks(ArrayList<String> linkList) {
+    public void sendLinks(ArrayList<String[]> linkList) {
         if (getState() == ConnState.CONNECTED_AS_CLIENT) {
             Iterator it = linkList.iterator();
             int i = 0;
             int id = 0;
 
             while (it.hasNext()) {
-                id = Integer.parseInt(linkList.get(i));
+                id = Integer.parseInt(linkList.get(i)[0]);
                 if (id > getLinkID()) {
                     setLinkID(id);
                     if (getState() != ConnState.DISCONNECTED) {
-                        if (channel.contains(linkList.get(i))) {
-                            sendMsgAndFlush(":! Link :" + linkList.get(i));
-                        }
+                        sendMsgAndFlush(":! Link :" + linkList.get(i)[1]);
                     }
                 }
                 i++;

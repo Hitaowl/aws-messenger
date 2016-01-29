@@ -26,7 +26,7 @@ public class Server implements Runnable {
     private ArrayList<Connection> connections;
     private ConnectToRDS database;
     private ArrayList<String[]> chatMessages;
-    private ArrayList<String> linkList;
+    private ArrayList<String[]> linkList;
 
     public Server(String IPAdress, int port) {
         try {
@@ -84,6 +84,7 @@ public class Server implements Runnable {
         while (it.hasNext()) {
             Connection c = (Connection) it.next();
             c.sendMessages(chatMessages);
+            c.sendLinks(linkList);
         }
     }
 

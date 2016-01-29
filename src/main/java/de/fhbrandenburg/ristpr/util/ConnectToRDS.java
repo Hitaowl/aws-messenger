@@ -6,7 +6,6 @@
 package de.fhbrandenburg.ristpr.util;
 
 
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -24,7 +23,7 @@ public class ConnectToRDS {
     private static Connection conn;
     private ResultSet recordset;
     private ArrayList<String[]> record;
-    private ArrayList<String> linkList;
+    private ArrayList<String[]> linkList;
 
     public ConnectToRDS() {
         recordset = null;
@@ -47,12 +46,13 @@ public class ConnectToRDS {
         return record;
     }
 
-    public ArrayList<String> getLinkList(String sql){
-        linkList = new ArrayList<String>();
+    public ArrayList<String[]> getLinkList(String sql) {
+        linkList = new ArrayList<String[]>();
         recordset = selectQuery(sql);
         try {
             while (recordset.next()) {
-                linkList.add(recordset.getString("link"));
+                String[] array = {"" + recordset.getInt("ID"), recordset.getString("link")};
+                linkList.add(array);
             }
             recordset.close();
         } catch (SQLException e) {
