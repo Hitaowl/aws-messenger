@@ -8,15 +8,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Created by Psycho on 27.01.2016.
  */
 public class Connection implements Runnable {
-
 
 
     private Thread thread;
@@ -32,7 +29,8 @@ public class Connection implements Runnable {
     private ConnectToRDS database;
     private Boolean isInterupted;
     private long time;
-    private int messageID;
+    private Map<String, Integer> messageID;
+    private int linkID;
 
     public Connection(Server server, ConnectToRDS database, Socket socket, BufferedReader input, PrintWriter output) {
         this.server = server;
@@ -47,8 +45,8 @@ public class Connection implements Runnable {
         this.database = database;
         thread = new Thread(this);
         thread.start();
-        this.messageID = 0;
         this.time = System.currentTimeMillis();
+        messageID = Collections.synchronizedMap(new HashMap<String, Integer>());
     }
 
     public void run() {
@@ -68,6 +66,8 @@ public class Connection implements Runnable {
                                         database.execute("INSERT INTO users (userName, serverName, lastAction, userHost) VALUES ('" + getNick() + "','" + server.getHost().getHostName() +
                                                 "','" + System.currentTimeMillis() + "','" + getHostName() + "')");
                                         setChannel("#default");
+                                        this.messageID.put("#default", 0);
+                                        setLinkID(0);
                                         sendMsgAndFlush(":" + getNick() + "!*@" + getHostName() + " JOIN #default");
                                     }
                                     sendMsgAndFlush("NOTICE " + getNick() + " *** Nick already exist. Disconnect...");
@@ -85,6 +85,7 @@ public class Connection implements Runnable {
                                 }
                                 break;
                             case "LINK":
+                                database.execute("INSERT INTO images (link) VALUES ('" + message.split(" ")[1] + "'");
                                 break;
 
                             case "QUIT":
@@ -102,9 +103,9 @@ public class Connection implements Runnable {
                                         getNick() + "', '" + message.substring(message.indexOf(":") + 1) + "', '1','" + message.split(" ")[1] + "')");
                                 break;
                             case "JOIN":
+                                setID(message.split(" ")[1], 0);
                                 setChannel(message.split(" ")[1]);
                                 sendMsgAndFlush(":" + getNick() + "!*@" + getHostName() + " JOIN " + message.split(" ")[1]);
-                                setID(0);
                                 break;
                         }
 
@@ -121,6 +122,7 @@ public class Connection implements Runnable {
     /**
      * schickt die übergebene Nachricht an den Client
      * der Connection
+     *
      * @param message zu übergebende Nachricht
      */
     public void sendMsgAndFlush(String message) {
@@ -146,8 +148,9 @@ public class Connection implements Runnable {
 
     /**
      * schickt alle 30 sec ein Ping an den Client
-     *
+     * <p>
      * schickt alle neuen Nachrichten an den Client
+     *
      * @param chatMessages Eine Liste der Messanges
      */
     public void sendMessages(ArrayList<String[]> chatMessages) {
@@ -156,18 +159,42 @@ public class Connection implements Runnable {
                 this.time = System.currentTimeMillis();
                 sendMsgAndFlush("PING " + getNick());
             }
-            chatMessages = server.getChatMessages();
             Iterator it = chatMessages.iterator();
             int i = 0;
             int id = 0;
 
             while (it.hasNext()) {
                 id = Integer.parseInt(chatMessages.get(i)[0]);
-                if (id > getID()) {
-                    setID(id);
+                if (channel.contains(chatMessages.get(i)[3]))
+                    if (id > getID(chatMessages.get(i)[3])) {
+                        setID(chatMessages.get(i)[3], id);
+                        if (getState() != ConnState.DISCONNECTED) {
+                            if (channel.contains(chatMessages.get(i)[3])) {
+                                sendMsgAndFlush(":" + chatMessages.get(i)[2] + "! PRIVMSG " + chatMessages.get(i)[3] + " :" + chatMessages.get(i)[1]);
+                            }
+                        }
+                    }
+                i++;
+                it.next();
+            }
+        }
+    }
+
+
+
+    public void sendLinks(ArrayList<String> linkList) {
+        if (getState() == ConnState.CONNECTED_AS_CLIENT) {
+            Iterator it = linkList.iterator();
+            int i = 0;
+            int id = 0;
+
+            while (it.hasNext()) {
+                id = Integer.parseInt(linkList.get(i));
+                if (id > getLinkID()) {
+                    setLinkID(id);
                     if (getState() != ConnState.DISCONNECTED) {
-                        if (channel.contains(chatMessages.get(i)[3])) {
-                            sendMsgAndFlush(":" + chatMessages.get(i)[2] + "! PRIVMSG " + chatMessages.get(i)[3] + " :" + chatMessages.get(i)[1]);
+                        if (channel.contains(linkList.get(i))) {
+                            sendMsgAndFlush(":! Link :" + linkList.get(i));
                         }
                     }
                 }
@@ -201,12 +228,20 @@ public class Connection implements Runnable {
         return thread.getName();
     }
 
-    public void setID(int id) {
-        messageID = id;
+    public void setID(String channel, int id) {
+        messageID.put(channel, id);
     }
 
-    public int getID() {
-        return messageID;
+    public int getID(String channel) {
+        return messageID.get(channel);
+    }
+
+    public void setLinkID(int id) {
+        linkID = id;
+    }
+
+    public int getLinkID() {
+        return linkID;
     }
 
     public void setState(ConnState state) {

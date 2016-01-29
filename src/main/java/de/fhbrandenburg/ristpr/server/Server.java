@@ -26,6 +26,7 @@ public class Server implements Runnable {
     private ArrayList<Connection> connections;
     private ConnectToRDS database;
     private ArrayList<String[]> chatMessages;
+    private ArrayList<String> linkList;
 
     public Server(String IPAdress, int port) {
         try {
@@ -78,6 +79,7 @@ public class Server implements Runnable {
      */
     public void updateMessages() {  //Wird alle 2 sec aufgeruffen da der Thread im 2 sec schläft.
         chatMessages = database.getRecord("SELECT ID, message, userName, channel FROM messages LIMIT 100");
+        linkList = database.getLinkList("SELECT ID, link FROM images LIMIT 100");
         Iterator it = connections.iterator();
         while (it.hasNext()) {
             Connection c = (Connection) it.next();

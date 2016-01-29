@@ -24,6 +24,7 @@ public class ConnectToRDS {
     private static Connection conn;
     private ResultSet recordset;
     private ArrayList<String[]> record;
+    private ArrayList<String> linkList;
 
     public ConnectToRDS() {
         recordset = null;
@@ -44,6 +45,20 @@ public class ConnectToRDS {
             e.printStackTrace();
         }
         return record;
+    }
+
+    public ArrayList<String> getLinkList(String sql){
+        linkList = new ArrayList<String>();
+        recordset = selectQuery(sql);
+        try {
+            while (recordset.next()) {
+                linkList.add(recordset.getString("link"));
+            }
+            recordset.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return linkList;
     }
 
     public String getUserName(String sql) {
