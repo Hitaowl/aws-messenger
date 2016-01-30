@@ -99,7 +99,7 @@ public class Client {
     }
 
     public void sendMessageToServer() {
-        writer.println(textField_Username.getText() + "" + textField_ClientMessage.getText());
+        writer.println("PRIVMSG #default :" + textField_ClientMessage.getText());
         writer.flush();
 
         textField_ClientMessage.setText("");
