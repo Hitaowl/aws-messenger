@@ -113,7 +113,7 @@ public class Connection implements Runnable {
                     }
                 } catch (IOException e) {
                     if (!this.isInterupted) {
-                        Loger.LOG(getNick() + "hat die Verbindung verloren");
+                        Loger.LOG(getNick() + " hat die Verbindung verloren");
                     }
                     kill();
                 }

@@ -2,10 +2,7 @@ package de.fhbrandenburg.ristpr.client;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -71,7 +68,13 @@ public class Client {
 
         // Panel zum ContentPane (Inhaltsbereich) hinzufügen
         clientFrame.getContentPane().add(BorderLayout.CENTER, clientPanel);
-
+        clientFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                sendCommend("QUIT " + nick);
+            }
+        });
         clientFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         clientFrame.setVisible(true);
     }
