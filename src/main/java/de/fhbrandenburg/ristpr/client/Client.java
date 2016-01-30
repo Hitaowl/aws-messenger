@@ -25,13 +25,11 @@ public class Client {
     Socket client;
     PrintWriter writer;
     BufferedReader reader;
+    String nick;
 
-    public static void main(String[] args) {
-        Client c = new Client();
-        c.createGUI();
-    }
+    public void createGUI(String ip, String port, String nick) {
+        this.nick = nick;
 
-    public void createGUI() {
         clientFrame = new JFrame("");
         clientFrame.setSize(800, 600);
 
@@ -48,6 +46,8 @@ public class Client {
         button_SendMessage.addActionListener(new SendButtonListener());
 
         textField_Username = new JTextField(10);
+        textField_Username.setText(nick);
+        textField_Username.setEditable(false);
 
         // Scrollbalken zur textArea hinzufügen
         scrollPane_Messages = new JScrollPane(textArea_Messages);
@@ -57,7 +57,7 @@ public class Client {
         scrollPane_Messages.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 
-        if(!connectToServer()) {
+        if (!connectToServer(ip, port)) {
             // Connect-Label anzeigen ob verbunden oder nicht...
         }
 
@@ -76,20 +76,26 @@ public class Client {
         clientFrame.setVisible(true);
     }
 
-    public boolean connectToServer() {
+    public boolean connectToServer(String ip, String port) {
         try {
-            client = new Socket("127.0.0.1", 4444);
+            client = new Socket(ip, Integer.parseInt(port));
             reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
             writer = new PrintWriter(client.getOutputStream());
             appendTextMessages("Netzwerkverbindung hergestellt");
+            sendCommend("NICK " + this.nick);
 
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             appendTextMessages("Netzwerkverbindung konnte nicht hergestellt werden");
             e.printStackTrace();
 
             return false;
         }
+    }
+
+    public void sendCommend(String message) {
+        writer.println(message);
+        writer.flush();
     }
 
     public void sendMessageToServer() {
@@ -109,16 +115,18 @@ public class Client {
 
         @Override
         public void keyPressed(KeyEvent arg0) {
-            if(arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
                 sendMessageToServer();
             }
         }
 
         @Override
-        public void keyReleased(KeyEvent arg0) {}
+        public void keyReleased(KeyEvent arg0) {
+        }
 
         @Override
-        public void keyTyped(KeyEvent arg0) {}
+        public void keyTyped(KeyEvent arg0) {
+        }
 
     }
 
@@ -138,7 +146,7 @@ public class Client {
             String message;
 
             try {
-                while((message = reader.readLine()) != null) {
+                while ((message = reader.readLine()) != null) {
                     appendTextMessages(message);
                     textArea_Messages.setCaretPosition(textArea_Messages.getText().length());
                 }

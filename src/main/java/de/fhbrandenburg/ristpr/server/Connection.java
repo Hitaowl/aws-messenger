@@ -69,8 +69,9 @@ public class Connection implements Runnable {
                                         this.messageID.put("#default", 0);
                                         setLinkID(0);
                                         sendMsgAndFlush(":" + getNick() + "!*@" + getHostName() + " JOIN #default");
+                                    } else {
+                                        sendMsgAndFlush("NOTICE " + getNick() + " *** Nick already exist. Disconnect...");
                                     }
-                                    sendMsgAndFlush("NOTICE " + getNick() + " *** Nick already exist. Disconnect...");
                                 } else {
 
                                     sendMsgAndFlush("NOTICE " + getNick() + " *** NICK length must be in-between 1 and 9 characters. Disconnect...");
