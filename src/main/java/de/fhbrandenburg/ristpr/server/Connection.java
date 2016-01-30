@@ -62,7 +62,7 @@ public class Connection implements Runnable {
                                     name = database.getUserName("SELECT userName FROM users WHERE userName = '" + message.split(" ")[1] + "'");
                                     if (!name.equals(message.split(" ")[1])) {
                                         setNick(message.split(" ")[1]);
-                                        sendMsgAndFlush("NOTICE " + getNick() + "  *** Hello " + getNick());
+                                        sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :*** Hello " + getNick());
                                         database.execute("INSERT INTO users (userName, serverName, lastAction, userHost) VALUES ('" + getNick() + "','" + server.getHost().getHostName() +
                                                 "','" + System.currentTimeMillis() + "','" + getHostName() + "')");
                                         setChannel("#default");
@@ -194,7 +194,7 @@ public class Connection implements Runnable {
                 if (id > getLinkID()) {
                     setLinkID(id);
                     if (getState() != ConnState.DISCONNECTED) {
-                        sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :LINK :" + linkList.get(i)[1]);
+                        sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :LINK " + linkList.get(i)[1]);
                     }
                 }
                 i++;

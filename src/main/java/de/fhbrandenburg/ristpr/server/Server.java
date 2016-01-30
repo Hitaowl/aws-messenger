@@ -62,7 +62,6 @@ public class Server implements Runnable {
                 connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Connection accepted. Looking up your hostname...");
                 connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Found your Hostname");
                 connection.setNick("User" + connection.getThreadName().substring(connection.getThreadName().length() - 1));
-                connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Your System generated Username is:" + "User" + connection.getThreadName().substring(connection.getThreadName().length() - 1));
                 connection.setState(ConnState.IDENTIFIED_AS_CLIENT);
 
                 this.connections.add(connection);

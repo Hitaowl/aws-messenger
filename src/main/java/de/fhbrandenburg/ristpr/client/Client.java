@@ -147,10 +147,30 @@ public class Client {
 
             try {
                 while ((message = reader.readLine()) != null) {
-                    appendTextMessages(message);
-                    textArea_Messages.setCaretPosition(textArea_Messages.getText().length());
+                    if (message.startsWith("PING")) {
+                        sendCommend("PONG " + nick);
+
+                    } else if (message.contains("NOTICE") && !message.contains("PRIVMSG") && !message.contains("LINK")) {
+                        appendTextMessages(message.substring(message.indexOf(":", 1) + 1));
+                        textArea_Messages.setCaretPosition(textArea_Messages.getText().length());
+
+                    } else if (message.contains("JOIN") && !message.contains("PRIVMSG")) {
+                        appendTextMessages("Sie befinden sich nun im Channel " + message.substring(message.lastIndexOf("#") - 1));
+                        textArea_Messages.setCaretPosition(textArea_Messages.getText().length());
+                    } else if (message.contains("PRIVMSG")) {
+                        appendTextMessages(message.split(" ")[0].substring(1, message.split(" ")[0].length()-1) + ": " +
+                                message.substring(message.indexOf(":", 1) + 1));
+                        textArea_Messages.setCaretPosition(textArea_Messages.getText().length());
+                    } else if (message.contains("NOTICE") && message.contains("LINK") && !message.contains("PRIVMSG")) {
+                        //hiel kommen linkst auf message.substring(message.indexof(":",1)).split(" ")[1]
+                        //!!! nicht getestet
+                    }
                 }
-            } catch (IOException e) {
+            } catch (
+                    IOException e
+                    )
+
+            {
                 appendTextMessages("Nachricht konnte nicht empfangen werden!");
                 e.printStackTrace();
             }
