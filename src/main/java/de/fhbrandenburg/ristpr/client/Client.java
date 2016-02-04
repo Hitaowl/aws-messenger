@@ -26,6 +26,9 @@ public class Client {
 
     public void createGUI(String ip, String port, String nick) {
         this.nick = nick;
+        
+        GUI gui = new GUI();
+        gui.constructFrame();
 
         clientFrame = new JFrame("");
         clientFrame.setSize(800, 600);
@@ -65,14 +68,14 @@ public class Client {
         clientPanel.add(textField_Username);
         clientPanel.add(textField_ClientMessage);
         clientPanel.add(button_SendMessage);
-
+        
         // Panel zum ContentPane (Inhaltsbereich) hinzufügen
         clientFrame.getContentPane().add(BorderLayout.CENTER, clientPanel);
         clientFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                sendCommend("QUIT " + nick);
+                sendCommend("QUIT " + getNick());
             }
         });
         clientFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -111,6 +114,10 @@ public class Client {
 
     public void appendTextMessages(String message) {
         textArea_Messages.append(message + "\n");
+    }
+    
+    public String getNick(){
+        return nick;
     }
 
     // Listener
