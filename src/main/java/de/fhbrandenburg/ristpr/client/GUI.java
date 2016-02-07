@@ -85,6 +85,7 @@ public class GUI {
         fileChooserFrame.setVisible(true);
         fileChooserFrame.getContentPane().add(fileChooser);
         URL = fileChooser.getSelectedFile().getAbsolutePath();
+        fileChooserFrame.setSize(500, 500);
         fileChooserFrame.setVisible(false);
         return URL;
         

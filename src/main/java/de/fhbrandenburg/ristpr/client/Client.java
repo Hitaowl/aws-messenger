@@ -24,7 +24,7 @@ public class Client {
     BufferedReader reader;
     String nick;
 
-    public void createGUI(String ip, String port, String nick) {
+    public void createGUI(String ip, String port, String nick) throws IOException {
         this.nick = nick;
         
         GUI gui = new GUI();
@@ -174,7 +174,12 @@ public class Client {
                     } else if (message.contains("NOTICE") && message.contains("LINK") && !message.contains("PRIVMSG")) {
                         //hiel kommen linkst auf message.substring(message.indexof(":",1)).split(" ")[1]
                         //!!! nicht getestet
+                    } else if (message.contains("LINK")) {
+                        GUI gui = new GUI();                        
+                        gui.gotPic(message.split(" ")[0].substring(1, message.split(" ")[0].length()-1) + ": " +
+                                message.substring(message.indexOf(":", 1) + 1));
                     }
+                    
                 }
             } catch (
                     IOException e
