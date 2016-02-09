@@ -21,7 +21,7 @@ public class AWSMessanger {
         Thread serverThread = null;
 
         int serverPort = Constants.PORT;
-        //String IPAdress = getPublicDomain();
+        String IPAdress = getPublicDomain();
 
         Loger.LOG("AWS-Messanger Server v-%s wird gestartet...", Constants.VERSION);
 
