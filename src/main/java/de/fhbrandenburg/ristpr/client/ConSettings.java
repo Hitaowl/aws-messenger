@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by fprus on 30.01.2016.
@@ -74,7 +77,11 @@ public class ConSettings {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            client.createGUI(idField.getText(), portField.getText(), nameField.getText());
+            try {
+                client.createGUI(idField.getText(), portField.getText(), nameField.getText());
+            } catch (IOException ex) {
+                Logger.getLogger(ConSettings.class.getName()).log(Level.SEVERE, null, ex);
+            }
             settingsFrame.dispose();
 
         }
