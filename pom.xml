@@ -35,6 +35,17 @@
       <version>1.9.3</version>
     </dependency>
   </dependencies>
+
+  <plugin>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <version>2.3</version>
+    <configuration>
+     <descriptorRefs>
+       <descriptorRef>jar-with-dependencies</descriptorRef>
+     </descriptorRefs>
+    </configuration>
+  </plugin>
+
 </project>
 
     
