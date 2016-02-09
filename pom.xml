@@ -27,6 +27,7 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.0.8</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>
@@ -36,3 +37,4 @@
   </dependencies>
 </project>
 
+    
