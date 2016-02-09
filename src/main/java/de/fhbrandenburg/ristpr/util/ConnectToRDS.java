@@ -7,6 +7,7 @@ package de.fhbrandenburg.ristpr.util;
 
 
 import java.sql.*;
+import com.mysql.jdbc.Driver;
 import java.util.ArrayList;
 
 /**
