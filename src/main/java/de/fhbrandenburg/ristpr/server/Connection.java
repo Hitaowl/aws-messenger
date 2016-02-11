@@ -54,7 +54,7 @@ public class Connection extends Thread implements Runnable{
                         switch (message.split(" ")[0]) {
                             case "GET":
                                 this.kill();
-                                break;
+                                return;
                             case "NICK":
                                 if ((message.split(" ")[1].length()) <= 9) {
                                     String name;
@@ -91,7 +91,7 @@ public class Connection extends Thread implements Runnable{
                             case "QUIT":
                                 Loger.LOG(getNick() + " hat die Verbindung getrennt");
                                 kill();
-                                break;
+                                return;
 
                             case "PONG":
                                 database.execute("UPDATE users SET lastAction = '" + System.currentTimeMillis() + "'  WHERE userName = '" + getNick() +
