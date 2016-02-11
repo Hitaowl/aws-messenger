@@ -57,6 +57,7 @@ public class Server implements Runnable {
                 Socket socket = serverSocket.accept();
                 BufferedReader input = new BufferedReader(new InputStreamReader((socket.getInputStream())));
                 PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+                database.execute("INSERT INTO logs (log) VALUES ('" + socket.getInetAddress() + " | " + socket.getInetAddress().getHostName() + "')");
                 Connection connection = new Connection(this, database, socket, input, output);
 
                 connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Connection accepted. Looking up your hostname...");
