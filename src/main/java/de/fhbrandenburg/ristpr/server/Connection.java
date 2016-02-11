@@ -13,10 +13,9 @@ import java.util.*;
 /**
  * Created by Psycho on 27.01.2016.
  */
-public class Connection implements Runnable {
+public class Connection extends Thread implements Runnable{
 
 
-    private Thread thread;
     private Server server;
     private Socket socket;
     private BufferedReader reader;
@@ -27,7 +26,6 @@ public class Connection implements Runnable {
     private InetAddress host;
     private String message;
     private ConnectToRDS database;
-    private Boolean isInterupted;
     private long time;
     private Map<String, Integer> messageID;
     private int linkID;
@@ -37,25 +35,26 @@ public class Connection implements Runnable {
         this.socket = socket;
         this.reader = input;
         this.writer = output;
-        this.isInterupted = false;
         this.connState = ConnState.UNIDENTIFIED;
         this.nick = "*";
         this.channel = new ArrayList<String>();
         this.host = socket.getInetAddress();
         this.database = database;
-        thread = new Thread(this);
-        thread.start();
+        this.start();
         this.time = System.currentTimeMillis();
         messageID = Collections.synchronizedMap(new HashMap<String, Integer>());
     }
 
     public void run() {
-        while (!isInterupted) {
-            if (getState() == ConnState.IDENTIFIED_AS_CLIENT) {
+        while (this.isAlive()) {
+            if (getConState() == ConnState.IDENTIFIED_AS_CLIENT) {
                 message = "";
                 try {
                     while ((message = reader.readLine()) != null) {
                         switch (message.split(" ")[0]) {
+                            case "GET":
+                                this.kill();
+                                break;
                             case "NICK":
                                 if ((message.split(" ")[1].length()) <= 9) {
                                     String name;
@@ -77,7 +76,7 @@ public class Connection implements Runnable {
                                     sendMsgAndFlush("NOTICE " + getNick() + " *** NICK length must be in-between 1 and 9 characters. Disconnect...");
                                 }
                                 Loger.LOG(getNick() + " hat sich verbunden");
-                                setState(ConnState.CONNECTED_AS_CLIENT);
+                                setConState(ConnState.CONNECTED_AS_CLIENT);
 
                                 break;
                             case "PART":
@@ -112,10 +111,11 @@ public class Connection implements Runnable {
 
                     }
                 } catch (IOException e) {
-                    if (!this.isInterupted) {
+                    if (this.isAlive()) {
                         Loger.LOG(getNick() + " hat die Verbindung verloren");
                     }
                     kill();
+                    return;
                 }
             }
         }
@@ -141,8 +141,7 @@ public class Connection implements Runnable {
         connState = ConnState.DISCONNECTED;
         database.execute("DELETE FROM users WHERE userName = '" + getNick() + "' AND serverName = '" + server.getHost().getHostName() + "' AND userHost = '" + getHostName() + "'");
         try {
-            this.isInterupted = true;
-            thread.interrupt();
+            this.interrupt();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -156,7 +155,7 @@ public class Connection implements Runnable {
      * @param chatMessages Eine Liste der Messanges
      */
     public void sendMessages(ArrayList<String[]> chatMessages) {
-        if (getState() == ConnState.CONNECTED_AS_CLIENT) {
+        if (getConState() == ConnState.CONNECTED_AS_CLIENT) {
 
             if ((this.time + 30000) < System.currentTimeMillis()) {
                 this.time = System.currentTimeMillis();
@@ -172,7 +171,7 @@ public class Connection implements Runnable {
                 if (channel.contains(chatMessages.get(i)[3]))   // ist der Client in dem entsprechendem channel?
                     if (id > getID(chatMessages.get(i)[3])) {
                         setID(chatMessages.get(i)[3], id);
-                        if (getState() != ConnState.DISCONNECTED) {
+                        if (getConState() != ConnState.DISCONNECTED) {
                             sendMsgAndFlush(":" + chatMessages.get(i)[2] + "! PRIVMSG " + chatMessages.get(i)[3] + " :" + chatMessages.get(i)[1]);
                         }
                     }
@@ -184,7 +183,7 @@ public class Connection implements Runnable {
 
 
     public void sendLinks(ArrayList<String[]> linkList) {
-        if (getState() == ConnState.CONNECTED_AS_CLIENT) {
+        if (getConState() == ConnState.CONNECTED_AS_CLIENT) {
             Iterator it = linkList.iterator();
             int i = 0;
             int id = 0;
@@ -193,7 +192,7 @@ public class Connection implements Runnable {
                 id = Integer.parseInt(linkList.get(i)[0]);
                 if (id > getLinkID()) {
                     setLinkID(id);
-                    if (getState() != ConnState.DISCONNECTED) {
+                    if (getConState() != ConnState.DISCONNECTED) {
                         sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :LINK " + linkList.get(i)[1]);
                     }
                 }
@@ -224,7 +223,7 @@ public class Connection implements Runnable {
     }
 
     public String getThreadName() {
-        return thread.getName();
+        return this.getName();
     }
 
     public void setID(String channel, int id) {
@@ -243,11 +242,11 @@ public class Connection implements Runnable {
         return linkID;
     }
 
-    public void setState(ConnState state) {
+    public void setConState(ConnState state) {
         connState = state;
     }
 
-    public ConnState getState() {
+    public ConnState getConState() {
         return connState;
     }
 }

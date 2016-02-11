@@ -52,7 +52,7 @@ public class AWSMessanger {
                                                         // *Nutzer tragen sich eigentlich selbständig aus
                                                         // -> trit eigentlich nur bei absturz eines Servers ein
             try {
-                serverThread.sleep(2000);
+                serverThread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

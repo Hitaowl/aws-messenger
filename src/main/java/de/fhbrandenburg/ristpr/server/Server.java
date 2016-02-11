@@ -62,7 +62,7 @@ public class Server implements Runnable {
                 connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Connection accepted. Looking up your hostname...");
                 connection.sendMsgAndFlush(":" + getHost() + " NOTICE " + connection.getNick() + " :*** Found your Hostname");
                 connection.setNick("User" + connection.getThreadName().substring(connection.getThreadName().length() - 1));
-                connection.setState(ConnState.IDENTIFIED_AS_CLIENT);
+                connection.setConState(ConnState.IDENTIFIED_AS_CLIENT);
 
                 this.connections.add(connection);
 
@@ -72,6 +72,7 @@ public class Server implements Runnable {
 
         }
     }
+
     /**
      * updated die Liste der Nachrichten
      * und ruft die sendMessage-methode jedes Clienten auf.
