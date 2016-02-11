@@ -30,7 +30,7 @@ public class Connection extends Thread implements Runnable {
     private Map<String, Integer> messageID;
     private int linkID;
 
-    public Connection(Server server, ConnectToRDS database, Socket socket, BufferedReader input, PrintWriter output) throws RuntimeException {
+    public Connection(Server server, ConnectToRDS database, Socket socket, BufferedReader input, PrintWriter output) {
         this.server = server;
         this.socket = socket;
         this.reader = input;
@@ -42,17 +42,6 @@ public class Connection extends Thread implements Runnable {
         this.host = socket.getInetAddress();
         this.time = System.currentTimeMillis();
         messageID = Collections.synchronizedMap(new HashMap<String, Integer>());
-        try {
-            this.message = input.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (this.message.split(" ")[0].equals("NICK")) {
-            nick(message);
-        } else {
-            kill();
-        }
-
         this.start();
     }
 
@@ -62,9 +51,30 @@ public class Connection extends Thread implements Runnable {
                 message = "";
                 try {
                     while ((message = reader.readLine()) != null) {
+                        database.execute("INSERT INTO logs (log) VALUES ('" + getName() + " | " + message + "')");
                         switch (message.split(" ")[0]) {
                             case "NICK":
-                                nick(message);
+                                if ((message.split(" ")[1].length()) <= 9) {
+                                    String name;
+                                    name = database.getUserName("SELECT userName FROM users WHERE userName = '" + message.split(" ")[1] + "'");
+                                    if (!name.equals(message.split(" ")[1])) {
+                                        setNick(message.split(" ")[1]);
+                                        sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :*** Hello " + getNick());
+                                        database.execute("INSERT INTO users (userName, serverName, lastAction, userHost) VALUES ('" + getNick() + "','" + server.getHost().getHostName() +
+                                                "','" + System.currentTimeMillis() + "','" + getHostName() + "')");
+                                        setChannel("#default");
+                                        this.messageID.put("#default", 0);
+                                        setLinkID(0);
+                                        sendMsgAndFlush(":" + getNick() + "!*@" + getHostName() + " JOIN #default");
+                                    } else {
+                                        sendMsgAndFlush("NOTICE " + getNick() + " *** Nick already exist. Disconnect...");
+                                    }
+                                } else {
+
+                                    sendMsgAndFlush("NOTICE " + getNick() + " *** NICK length must be in-between 1 and 9 characters. Disconnect...");
+                                }
+                                Loger.LOG(getNick() + " hat sich verbunden");
+                                setConState(ConnState.CONNECTED_AS_CLIENT);
                                 break;
                             case "PART":
                                 if (channel.contains(message.split(" ")[1])) {
@@ -187,30 +197,6 @@ public class Connection extends Thread implements Runnable {
                 it.next();
             }
         }
-    }
-
-    public void nick(String message){
-        if ((message.split(" ")[1].length()) <= 9) {
-            String name;
-            name = database.getUserName("SELECT userName FROM users WHERE userName = '" + message.split(" ")[1] + "'");
-            if (!name.equals(message.split(" ")[1])) {
-                setNick(message.split(" ")[1]);
-                sendMsgAndFlush(":" + server.getHost() + " NOTICE " + getNick() + " :*** Hello " + getNick());
-                database.execute("INSERT INTO users (userName, serverName, lastAction, userHost) VALUES ('" + getNick() + "','" + server.getHost().getHostName() +
-                        "','" + System.currentTimeMillis() + "','" + getHostName() + "')");
-                setChannel("#default");
-                this.messageID.put("#default", 0);
-                setLinkID(0);
-                sendMsgAndFlush(":" + getNick() + "!*@" + getHostName() + " JOIN #default");
-            } else {
-                sendMsgAndFlush("NOTICE " + getNick() + " *** Nick already exist. Disconnect...");
-            }
-        } else {
-
-            sendMsgAndFlush("NOTICE " + getNick() + " *** NICK length must be in-between 1 and 9 characters. Disconnect...");
-        }
-        Loger.LOG(getNick() + " hat sich verbunden");
-        setConState(ConnState.CONNECTED_AS_CLIENT);
     }
 
     public String getNick() {
