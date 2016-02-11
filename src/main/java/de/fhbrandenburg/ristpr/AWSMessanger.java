@@ -37,7 +37,7 @@ public class AWSMessanger {
 
 
         // Server wird gestartet ---------------------------------------------------------
-        serverObject = new Server("127.0.0.1", serverPort);
+        serverObject = new Server(IPAdress, serverPort);
         serverThread = new Thread(serverObject);
         serverThread.start();
 
